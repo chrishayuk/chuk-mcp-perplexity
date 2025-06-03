@@ -6,6 +6,14 @@ host:
 server:
   type: "sse"  # Options: stdio, websocket
 
+sse:
+  host: "0.0.0.0"
+  port: 8020
+  sse_path: "/sse"
+  message_path: "/messages/"
+  log_level: "info"
+  access_log: false
+
 mcp_servers:
   perplexity_server:
     enabled: true

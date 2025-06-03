@@ -374,7 +374,7 @@ wheels = [
 
 [[package]]
 name = "chuk-llm"
-version = "0.1.6"
+version = "0.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anthropic" },
@@ -391,9 +391,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "tiktoken" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/7a/dc82c17a601d0a29212d533a6d1520b7a2a6d9bdf2d4489b574377966ecc/chuk_llm-0.1.6.tar.gz", hash = "sha256:8a934cc5c867868e43ca0897ccb8073eace19dd7395a59d1fd4d4cbe74ef061d", size = 57576 }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/d3/e03fc70c2c09c643f90b3a2f8053d5c089459f54e560fc301245308da1b6/chuk_llm-0.1.8.tar.gz", hash = "sha256:ae52a1781bc7ce5b6e908ae0cf2a01aea3566e0c95b11db27fe0f989761fc1ad", size = 59734 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/08/a6/df0d44b18eaaca3017e10c33b55b2d207ba91fc4b42032ea566697dbd839/chuk_llm-0.1.6-py3-none-any.whl", hash = "sha256:a0b3b908628afbc81778a531379d30177c6c8401f88fbcf0c408f2d6c4f9854d", size = 68276 },
+    { url = "https://files.pythonhosted.org/packages/e6/a8/5d3e1021daab306887e372612aace0f0b68336f21b6942c0ea9192756d33/chuk_llm-0.1.8-py3-none-any.whl", hash = "sha256:3ab8426a8dedb1a17ea1cd1a058fad91b1fbd34e0eb8005d519c9724b3ed909f", size = 69258 },
 ]
 
 [[package]]
@@ -430,7 +430,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "chuk-llm", specifier = ">=0.1.6" },
+    { name = "chuk-llm", specifier = ">=0.1.8" },
     { name = "chuk-mcp-runtime", specifier = ">=0.2.3" },
     { name = "mcp", specifier = ">=1.6.0" },
     { name = "pydantic", specifier = ">=2.11.2" },
