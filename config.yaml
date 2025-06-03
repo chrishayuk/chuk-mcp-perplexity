@@ -4,7 +4,7 @@ host:
   log_level: "INFO"
 
 server:
-  type: "stdio"  # Options: stdio, websocket
+  type: "sse"  # Options: stdio, websocket
 
 mcp_servers:
   perplexity_server:
