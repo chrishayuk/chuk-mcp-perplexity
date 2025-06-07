@@ -4,7 +4,7 @@ host:
   log_level: "INFO"
 
 server:
-  type: "sse"  # Options: stdio, websocket
+  type: "stdio"  # Options: stdio, websocket
 
 sse:
   host: "0.0.0.0"
