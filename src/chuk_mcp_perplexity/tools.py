@@ -10,13 +10,14 @@ Exposed tools
 * **perplexity_deep_research** - long-form research answers with
   `sonar-reasoning-pro` (90s timeout).
 * **perplexity_quick_fact** - ultra-fast fact checking (15s timeout).
+* **perplexity_search_with_citations** - citation-focused search (45s timeout).
 
 Key points
 ~~~~~~~~~~
 * The tools are **native async** with configurable per-tool timeouts
 * Each tool has an appropriate timeout based on expected response time
 * Timeout can be overridden in config.yaml or environment variables
-* Uses latest chuk_llm API with auto-generated provider functions
+* Uses stable chuk_llm client API (discovery-independent)
 """
 
 from __future__ import annotations
@@ -26,8 +27,8 @@ from typing import Dict, List
 
 from pydantic import ValidationError
 
-# Import latest chuk_llm API
-from chuk_llm import ask_perplexity, ask_perplexity_sync
+# Import stable chuk_llm client API (discovery-independent)
+from chuk_llm.llm.client import get_client
 from chuk_mcp_runtime.common.mcp_tool_decorator import mcp_tool
 
 from .models import (
@@ -57,13 +58,12 @@ async def perplexity_search(query: str) -> Dict:
     except ValidationError as exc:
         raise ValueError(f"Invalid input for perplexity_search: {exc}")
 
-    # Use latest chuk_llm API with auto-generated function
     try:
-        result = await ask_perplexity(
-            validated.query,
-            model="sonar-pro"
-        )
-        return PerplexitySearchResult(answer=result).model_dump()
+        # Use stable chuk_llm client API
+        client = get_client("perplexity", model="sonar-pro")
+        messages = [{"role": "user", "content": validated.query}]
+        result = await client.create_completion(messages=messages)
+        return PerplexitySearchResult(answer=result["response"]).model_dump()
     except asyncio.TimeoutError:
         raise ValueError("Perplexity search timed out after 30 seconds")
     except Exception as e:
@@ -90,13 +90,22 @@ async def perplexity_deep_research(query: str) -> Dict:
     except ValidationError as exc:
         raise ValueError(f"Invalid input for perplexity_deep_research: {exc}")
 
-    # Use latest chuk_llm API with reasoning model
+    # Enhanced prompt for comprehensive research
+    research_prompt = f"""Please provide a comprehensive, well-researched answer to: {validated.query}
+
+Requirements:
+- Include multiple reliable sources with citations
+- Provide detailed analysis and context
+- Include relevant statistics or data when available
+- Mention any conflicting viewpoints or limitations
+- Use clear, structured formatting"""
+
     try:
-        result = await ask_perplexity(
-            validated.query,
-            model="sonar-reasoning-pro"
-        )
-        return PerplexityResearchResult(answer=result).model_dump()
+        # Use stable chuk_llm client API with reasoning model
+        client = get_client("perplexity", model="sonar-reasoning-pro")
+        messages = [{"role": "user", "content": research_prompt}]
+        result = await client.create_completion(messages=messages)
+        return PerplexityResearchResult(answer=result["response"]).model_dump()
     except asyncio.TimeoutError:
         raise ValueError("Perplexity deep research timed out after 90 seconds")
     except Exception as e:
@@ -123,13 +132,12 @@ async def perplexity_quick_fact(query: str) -> Dict:
     except ValidationError as exc:
         raise ValueError(f"Invalid input for perplexity_quick_fact: {exc}")
 
-    # Use latest chuk_llm API with fast sonar model
     try:
-        result = await ask_perplexity(
-            validated.query,
-            model="sonar"  # Faster model for quick facts
-        )
-        return PerplexitySearchResult(answer=result).model_dump()
+        # Use fast sonar model for quick facts
+        client = get_client("perplexity", model="sonar")
+        messages = [{"role": "user", "content": validated.query}]
+        result = await client.create_completion(messages=messages)
+        return PerplexitySearchResult(answer=result["response"]).model_dump()
     except asyncio.TimeoutError:
         raise ValueError("Perplexity quick fact timed out after 15 seconds")
     except Exception as e:
@@ -166,11 +174,10 @@ Please include:
 - Multiple sources for verification"""
 
     try:
-        result = await ask_perplexity(
-            enhanced_query,
-            model="sonar-pro"
-        )
-        return PerplexitySearchResult(answer=result).model_dump()
+        client = get_client("perplexity", model="sonar-pro")
+        messages = [{"role": "user", "content": enhanced_query}]
+        result = await client.create_completion(messages=messages)
+        return PerplexitySearchResult(answer=result["response"]).model_dump()
     except asyncio.TimeoutError:
         raise ValueError("Perplexity search with citations timed out after 45 seconds")
     except Exception as e:
@@ -178,17 +185,41 @@ Please include:
 
 
 # ---------------------------------------------------------------------------
-# Utility function for sync usage
+# Tool: perplexity_current_events (45 second timeout)
 # ---------------------------------------------------------------------------
-def perplexity_search_sync(query: str, model: str = "sonar-pro") -> str:
+@mcp_tool(
+    name="perplexity_current_events",
+    description="Real-time news and current events using Perplexity sonar-pro",
+    timeout=45  # 45 seconds for current events
+)
+async def perplexity_current_events(query: str) -> Dict:
     """
-    Synchronous wrapper for Perplexity search - useful for testing.
+    Return current news and events related to the query.
     
     Args:
-        query: User query
-        model: Perplexity model to use
-        
-    Returns:
-        Response string
+        query: Topic to search for current events
     """
-    return ask_perplexity_sync(query, model=model)
+    try:
+        validated = PerplexitySearchInput(query=query)
+    except ValidationError as exc:
+        raise ValueError(f"Invalid input for perplexity_current_events: {exc}")
+
+    # Enhanced prompt for current events
+    events_prompt = f"""Please provide current news and recent developments about: {validated.query}
+
+Focus on:
+- Latest news from the past week
+- Recent developments and trends
+- Reliable news sources with publication dates
+- Key facts and figures
+- Important context for understanding current situation"""
+
+    try:
+        client = get_client("perplexity", model="sonar-pro")
+        messages = [{"role": "user", "content": events_prompt}]
+        result = await client.create_completion(messages=messages)
+        return PerplexitySearchResult(answer=result["response"]).model_dump()
+    except asyncio.TimeoutError:
+        raise ValueError("Perplexity current events search timed out after 45 seconds")
+    except Exception as e:
+        raise ValueError(f"Perplexity current events search failed: {str(e)}")
