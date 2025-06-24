@@ -9,7 +9,7 @@ description = "MCP Perplexity Server"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "chuk-llm>=0.1.8",
+    "chuk-llm>=0.8",
     "chuk-mcp-runtime>=0.2.3",
     "mcp>=1.6.0",
     "pydantic>=2.11.2",
