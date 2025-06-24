@@ -60,7 +60,7 @@ async def perplexity_search(query: str) -> Dict:
 
     try:
         # Use stable chuk_llm client API
-        client = get_client("perplexity", model="sonar-pro")
+        client = get_client(provider="perplexity", model="sonar-pro")
         messages = [{"role": "user", "content": validated.query}]
         result = await client.create_completion(messages=messages)
         return PerplexitySearchResult(answer=result["response"]).model_dump()
@@ -102,7 +102,7 @@ Requirements:
 
     try:
         # Use stable chuk_llm client API with reasoning model
-        client = get_client("perplexity", model="sonar-reasoning-pro")
+        client = get_client(provider="perplexity", model="sonar-reasoning-pro")
         messages = [{"role": "user", "content": research_prompt}]
         result = await client.create_completion(messages=messages)
         return PerplexityResearchResult(answer=result["response"]).model_dump()
@@ -134,7 +134,7 @@ async def perplexity_quick_fact(query: str) -> Dict:
 
     try:
         # Use fast sonar model for quick facts
-        client = get_client("perplexity", model="sonar")
+        client = get_client(provider="perplexity", model="sonar")
         messages = [{"role": "user", "content": validated.query}]
         result = await client.create_completion(messages=messages)
         return PerplexitySearchResult(answer=result["response"]).model_dump()
@@ -174,7 +174,7 @@ Please include:
 - Multiple sources for verification"""
 
     try:
-        client = get_client("perplexity", model="sonar-pro")
+        client = get_client(provider="perplexity", model="sonar-pro")
         messages = [{"role": "user", "content": enhanced_query}]
         result = await client.create_completion(messages=messages)
         return PerplexitySearchResult(answer=result["response"]).model_dump()
@@ -215,7 +215,7 @@ Focus on:
 - Important context for understanding current situation"""
 
     try:
-        client = get_client("perplexity", model="sonar-pro")
+        client = get_client(provider="perplexity", model="sonar-pro")
         messages = [{"role": "user", "content": events_prompt}]
         result = await client.create_completion(messages=messages)
         return PerplexitySearchResult(answer=result["response"]).model_dump()
@@ -223,3 +223,85 @@ Focus on:
         raise ValueError("Perplexity current events search timed out after 45 seconds")
     except Exception as e:
         raise ValueError(f"Perplexity current events search failed: {str(e)}")
+    
+# ---------------------------------------------------------------------------
+# Tool: perplexity_comparative_analysis (60 second timeout)
+# ---------------------------------------------------------------------------
+@mcp_tool(
+    name="perplexity_comparative_analysis",
+    description="Comparative analysis using Perplexity sonar-reasoning-pro",
+    timeout=60  # 60 seconds for comparative analysis
+)
+async def perplexity_comparative_analysis(query: str) -> Dict:
+    """
+    Return a comparative analysis of topics, options, or alternatives.
+    
+    Args:
+        query: Topic requiring comparative analysis
+    """
+    try:
+        validated = PerplexityResearchInput(query=query)
+    except ValidationError as exc:
+        raise ValueError(f"Invalid input for perplexity_comparative_analysis: {exc}")
+
+    # Enhanced prompt for comparative analysis
+    analysis_prompt = f"""Please provide a comprehensive comparative analysis of: {validated.query}
+
+Structure your analysis with:
+- Clear comparison criteria
+- Pros and cons for each option/aspect
+- Relevant data and evidence
+- Expert opinions or studies
+- Balanced conclusion with recommendations
+- Sources and citations for verification"""
+
+    try:
+        client = get_client(provider="perplexity", model="sonar-reasoning-pro")
+        messages = [{"role": "user", "content": analysis_prompt}]
+        result = await client.create_completion(messages=messages)
+        return PerplexityResearchResult(answer=result["response"]).model_dump()
+    except asyncio.TimeoutError:
+        raise ValueError("Perplexity comparative analysis timed out after 60 seconds")
+    except Exception as e:
+        raise ValueError(f"Perplexity comparative analysis failed: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# Tool: perplexity_trending_topics (20 second timeout)
+# ---------------------------------------------------------------------------
+@mcp_tool(
+    name="perplexity_trending_topics",
+    description="Discover trending topics and discussions using Perplexity sonar-pro",
+    timeout=20  # 20 seconds for trending topics
+)
+async def perplexity_trending_topics(category: str = "general") -> Dict:
+    """
+    Return current trending topics and discussions.
+    
+    Args:
+        category: Category of trends (general, technology, politics, sports, etc.)
+    """
+    try:
+        validated = PerplexitySearchInput(query=category)
+    except ValidationError as exc:
+        raise ValueError(f"Invalid input for perplexity_trending_topics: {exc}")
+
+    # Trending topics prompt
+    trending_prompt = f"""What are the current trending topics and major discussions in {validated.query}?
+
+Please provide:
+- Top 5-10 trending topics
+- Brief description of each trend
+- Why each topic is currently popular
+- Recent developments or events driving the trend
+- Relevant hashtags or keywords if applicable"""
+
+    try:
+        client = get_client(provider="perplexity", model="sonar-pro")
+        messages = [{"role": "user", "content": trending_prompt}]
+        result = await client.create_completion(messages=messages)
+        return PerplexitySearchResult(answer=result["response"]).model_dump()
+    except asyncio.TimeoutError:
+        raise ValueError("Perplexity trending topics search timed out after 20 seconds")
+    except Exception as e:
+        raise ValueError(f"Perplexity trending topics search failed: {str(e)}")
