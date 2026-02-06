@@ -23,7 +23,7 @@ Key points
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, List
+from typing import Dict
 
 from pydantic import ValidationError
 
@@ -38,18 +38,19 @@ from .models import (
     PerplexityResearchResult,
 )
 
+
 # ---------------------------------------------------------------------------
 # Tool: perplexity_search (30 second timeout)
 # ---------------------------------------------------------------------------
 @mcp_tool(
     name="perplexity_search",
     description="Quick conversational answer using Perplexity sonar-pro",
-    timeout=30  # 30 seconds for quick search
+    timeout=30,  # 30 seconds for quick search
 )
 async def perplexity_search(query: str) -> Dict:
     """
     Return a short, conversational answer using Perplexity sonar-pro.
-    
+
     Args:
         query: User query to be answered briefly
     """
@@ -76,12 +77,12 @@ async def perplexity_search(query: str) -> Dict:
 @mcp_tool(
     name="perplexity_deep_research",
     description="Comprehensive, citation-rich answer using Perplexity sonar-reasoning-pro",
-    timeout=90  # 90 seconds for deep research
+    timeout=90,  # 90 seconds for deep research
 )
 async def perplexity_deep_research(query: str) -> Dict:
     """
     Return an in-depth, well-sourced answer using Perplexity sonar-reasoning-pro.
-    
+
     Args:
         query: User query requiring in-depth research
     """
@@ -118,12 +119,12 @@ Requirements:
 @mcp_tool(
     name="perplexity_quick_fact",
     description="Ultra-fast fact checking using Perplexity sonar",
-    timeout=15  # 15 seconds for quick facts
+    timeout=15,  # 15 seconds for quick facts
 )
 async def perplexity_quick_fact(query: str) -> Dict:
     """
     Return a quick factual answer for simple queries.
-    
+
     Args:
         query: Simple factual query
     """
@@ -150,12 +151,12 @@ async def perplexity_quick_fact(query: str) -> Dict:
 @mcp_tool(
     name="perplexity_search_with_citations",
     description="Search with explicit citation requirements using Perplexity sonar-pro",
-    timeout=45  # 45 seconds for citation-heavy search
+    timeout=45,  # 45 seconds for citation-heavy search
 )
 async def perplexity_search_with_citations(query: str) -> Dict:
     """
     Return an answer with explicit citation requirements.
-    
+
     Args:
         query: User query that needs citations
     """
@@ -190,12 +191,12 @@ Please include:
 @mcp_tool(
     name="perplexity_current_events",
     description="Real-time news and current events using Perplexity sonar-pro",
-    timeout=45  # 45 seconds for current events
+    timeout=45,  # 45 seconds for current events
 )
 async def perplexity_current_events(query: str) -> Dict:
     """
     Return current news and events related to the query.
-    
+
     Args:
         query: Topic to search for current events
     """
@@ -223,19 +224,20 @@ Focus on:
         raise ValueError("Perplexity current events search timed out after 45 seconds")
     except Exception as e:
         raise ValueError(f"Perplexity current events search failed: {str(e)}")
-    
+
+
 # ---------------------------------------------------------------------------
 # Tool: perplexity_comparative_analysis (60 second timeout)
 # ---------------------------------------------------------------------------
 @mcp_tool(
     name="perplexity_comparative_analysis",
     description="Comparative analysis using Perplexity sonar-reasoning-pro",
-    timeout=60  # 60 seconds for comparative analysis
+    timeout=60,  # 60 seconds for comparative analysis
 )
 async def perplexity_comparative_analysis(query: str) -> Dict:
     """
     Return a comparative analysis of topics, options, or alternatives.
-    
+
     Args:
         query: Topic requiring comparative analysis
     """
@@ -272,12 +274,12 @@ Structure your analysis with:
 @mcp_tool(
     name="perplexity_trending_topics",
     description="Discover trending topics and discussions using Perplexity sonar-pro",
-    timeout=20  # 20 seconds for trending topics
+    timeout=20,  # 20 seconds for trending topics
 )
 async def perplexity_trending_topics(category: str = "general") -> Dict:
     """
     Return current trending topics and discussions.
-    
+
     Args:
         category: Category of trends (general, technology, politics, sports, etc.)
     """

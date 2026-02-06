@@ -1,4 +1,5 @@
 """Unit-tests for the Perplexity MCP tools."""
+
 from typing import Any, Dict, List
 
 import pytest
@@ -7,6 +8,7 @@ from chuk_mcp_perplexity.tools import (
     perplexity_search,
     perplexity_deep_research,
 )
+
 
 # --------------------------------------------------------------------------- #
 # Global monkey-patch for chuk-llm client
@@ -24,10 +26,12 @@ def _patch_llm_client(monkeypatch):
 
     # Patch the canonical location…
     import chuk_llm.llm.llm_client as llm_mod
+
     monkeypatch.setattr(llm_mod, "get_llm_client", _fake_get_llm_client)
 
     # …and the copy imported inside our tools module.
     import chuk_mcp_perplexity.tools as tools_mod
+
     monkeypatch.setattr(tools_mod, "get_llm_client", _fake_get_llm_client)
 
     yield
